@@ -1,151 +1,117 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+
 
 public struct RpgStats
 {
-	[System.Flags]
+	public Stats FlatStats;
+	public Stats CoefStats;
+
+	public RpgStats(Stats flatStats, Stats coefStats)
+	{
+		FlatStats = flatStats;
+		CoefStats = coefStats;
+	}
+
+	public string ToString(string[] namesStats)
+	{
+		return FlatStats.ToString(namesStats) + "\n" + CoefStats.ToString(namesStats);
+	}
+}
+
+public struct Stats
+{
+	public Stat[] Values;
+
+	public Stats(Stat[] stats)
+	{
+		Values = stats;
+	}
+
+	public void AddStats(Stats otherStats)
+	{
+		for (int i = otherStats.Values.Length - 1; i >= 0; --i)
+		{
+			AddBaseStat(otherStats.Values[i].Key, otherStats.Values[i].Value);
+		}
+	}
+
+	public void AddBaseStat(int indexStat, float value)
+	{
+		for (int i = Values.Length - 1; i >= 0; --i)
+		{
+			if (Values[i].Key != indexStat)
+				continue;
+
+			Values[indexStat].Value += value;
+			return;
+		}
+	}
+
+	public string ToString(string[] namesStats = null)
+	{ 
+		var txt = new StringBuilder();
+		for (int i = 0, iLength = Values.Length; i < iLength; i++)
+		{
+			txt.Append((namesStats != null && namesStats.Length > i ? namesStats[Values[i].Key] : i.ToString()) + " : " + Values[i].Value + "\n");
+		}
+
+		return txt.ToString();
+	}
+}
+
+
+public enum EAddType
+{
+	ADD,
+	MULTIPLI,
+}
+
+public struct Stat
+{
 	public enum EBaseStats
 	{
-		STRENGTH = 1,
-		DEXTERITY = 2,
-		VITALITY = 4,
-		WISDOM = 8,
-		LUCK = 16,
+		STRENGTH,
+		DEXTERITY,
+		VITALITY,
+		WISDOM,
+		LUCK,
+		PHYSICS_RES,
+		PHYSICS_DMG ,
+		MAGIC_RES,
+		MAGIC_DMG,
+		COEF_CRIT,
+		COEF_CRIT_DMG_MULTIPLIER,
+		ATTACK_SPEED,
+		COOLDOWN_REDUCTION,
+		SPEED,
+		DROP_RATE,
+		HP,
 	}
+	public int Key;
+	public float Value;
 
-	[System.Flags]
-	public enum EAdvancedStats
+	public Stat(int key, float value)
 	{
-		PHYSICS_RES = 1,
-		PHYSICS_DMG = 2,
-		MAGIC_RES = 4,
-		MAGIC_DMG = 8,
-		COEF_CRIT = 16,
-		COEF_CRIT_DMG_MULTIPLIER = 32,
-		ATTACK_SPEED = 64,
-		COOLDOWN_REDUCTION = 128,
-		SPEED = 256,
-		DROP_RATE = 512,
-		HP = 1024,
+		Key = key;
+		Value = value;
 	}
+}
 
-	public enum EAddType
-	{
-		ADD,
-		MULTIPLI,
-	}
-
-	public float Strength;
-	public float Dexterity;
-	public float Vitality;
-	public float Wisdom;
-	public float Luck;
-
-	public float PhysicRes;
-	public float MagicRes;
-	public float Crit;
-	public float CritDmgMultiplier;
-	public float Speed;
-	public float AttackSpeed;
-	public float CoefCooldown;
-	public float DmgPhysique;
-	public float DmgMagique;
-	public float HP;
-	public float DropRate;
-
-	public void AddStat(EBaseStats statSelected, float value)
-	{
-		switch (statSelected)
-		{
-			case EBaseStats.STRENGTH:
-				Strength += value;
-				break;
-			case EBaseStats.DEXTERITY:
-				Dexterity += value;
-				break;
-			case EBaseStats.VITALITY:
-				Vitality += value;
-				break;
-			case EBaseStats.WISDOM:
-				Wisdom += value;
-				break;
-			case EBaseStats.LUCK:
-				Luck += value;
-				break;
-			default:
-				break;
-		}
-		Debug.LogWarning(ToString());
-	}
-	public void AddStat(EAdvancedStats statSelected, float value)
-	{
-		switch (statSelected)
-		{
-			case EAdvancedStats.PHYSICS_RES:
-				PhysicRes += value;
-				break;
-			case EAdvancedStats.PHYSICS_DMG:
-				DmgPhysique += value;
-				break;
-			case EAdvancedStats.MAGIC_RES:
-				MagicRes += value;
-				break;
-			case EAdvancedStats.MAGIC_DMG:
-				DmgMagique += value;
-				break;
-			case EAdvancedStats.COEF_CRIT:
-				Crit += value;
-				break;
-			case EAdvancedStats.COEF_CRIT_DMG_MULTIPLIER:
-				CritDmgMultiplier += value;
-				break;
-			case EAdvancedStats.ATTACK_SPEED:
-				AttackSpeed += value;
-				break;
-			case EAdvancedStats.COOLDOWN_REDUCTION:
-				CoefCooldown += value;
-				break;
-			case EAdvancedStats.SPEED:
-				Speed += value;
-				break;
-			case EAdvancedStats.DROP_RATE:
-				DropRate += value;
-				break;
-			case EAdvancedStats.HP:
-				HP += value;
-				break;
-		}
-
-		Debug.LogWarning(ToString());
-	}
-
-	public override string ToString()
-	{
-		return "Strength  : " + Strength + "\n" +
-			"Dexterity  : " + Dexterity + "\n" +
-			"Vitality  : " + Vitality + "\n" +
-			"Wisdom  : " + Wisdom + "\n" +
-			"Luck  : " + Luck + "\n" +
-			"PhysicRes  : " + PhysicRes + "\n" +
-			"MagicRes  : " + MagicRes + "\n" +
-			"Crit  : " + Crit + "\n" +
-			"CritDmgMultiplier  : " + CritDmgMultiplier + "\n" +
-			"Speed  : " + Speed + "\n" +
-			"AttackSpeed  : " + AttackSpeed + "\n" +
-			"CoefCooldown  : " + CoefCooldown + "\n" +
-			"DmgPhysique  : " + DmgPhysique + "\n" +
-			"DmgMagique  : " + DmgMagique + "\n" +
-			"HP  : " + HP + "\n" +
-			"DropRate  : " + DropRate + "\n";
-	}
+public struct StatClamp
+{
+	public Stat Value;
+	public float Min;
+	public float Max;
 }
 
 public class EntityConfig
 {
-	public RpgStats BaseStats;
-	public RpgStats GainBaseStatsByLvl;
+	public Stats BaseStats;
+	public Stats GainBaseStatsByLvl;
 }
 
 public class Entity
@@ -153,7 +119,7 @@ public class Entity
 	public EntityConfig EntityData;
 	public EntityEquipement Equipements;
 	public BuffStats[] Buffs;
-	public RpgStats CurrentStats;
+	public Stats CurrentStats;
 
 	//CalculStatsFinal;
 	//CalculStatsFinalWithoutBuff
@@ -174,8 +140,7 @@ public class BuffStats
 
 	public string NameBuff;
 	public EBuff TypeBuff;
-	public RpgStats BaseStats;
-	public RpgStats CoefStats;
+	public RpgStats Stats;
 
 	public float Duration;
 }
@@ -215,8 +180,7 @@ public class Equipement
 	public string Name;
 	public EEquipement Type;
 	public EQuality Quality;
-	public RpgStats BaseStats;
-	public RpgStats CoefBonus;
+	public RpgStats Stats;
 }
 // BaseStatsFinal = BaseStats + BonusFlatBaseStats + BaseStats * BonusCoefBaseStats
 // ItemsStatsFinal = Foreach ( itemStats)

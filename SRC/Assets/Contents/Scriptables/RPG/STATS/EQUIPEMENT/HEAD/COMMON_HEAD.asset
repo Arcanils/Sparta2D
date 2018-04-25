@@ -11,9 +11,132 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adddead5b00aec3419f8897b368e5597, type: 3}
   m_Name: COMMON_HEAD
   m_EditorClassIdentifier: 
-  Quality: 0
-  Probs:
-  - Data: {fileID: 11400000, guid: c846360405e7fa049bff6a79d7182e4c, type: 2}
-    LuckToBeTheChosenOne: 10000
-  - Data: {fileID: 11400000, guid: 7fc07e34583c8d043b369a47aa123a65, type: 2}
-    LuckToBeTheChosenOne: 10000
+  FlatRandomStats:
+  - StatSelected: 0
+    MinValue: 2
+    MaxValue: 6
+  - StatSelected: 1
+    MinValue: 2
+    MaxValue: 6
+  - StatSelected: 2
+    MinValue: 2
+    MaxValue: 6
+  - StatSelected: 3
+    MinValue: 2
+    MaxValue: 6
+  - StatSelected: 4
+    MinValue: 2
+    MaxValue: 6
+  - StatSelected: 5
+    MinValue: 3
+    MaxValue: 3
+  - StatSelected: 6
+    MinValue: 3
+    MaxValue: 3
+  - StatSelected: 15
+    MinValue: 10
+    MaxValue: 40
+  CoefRandomStats:
+  - StatSelected: 0
+    MinValue: 5
+    MaxValue: 10
+  - StatSelected: 2
+    MinValue: 5
+    MaxValue: 10
+  QualityStatsToSelect:
+  - Quality: 0
+    NStatsToAdd: 2
+    StatLucks:
+    - Stat: 0
+      AddType: 0
+      Luck: 10000
+    - Stat: 1
+      AddType: 0
+      Luck: 10000
+    - Stat: 2
+      AddType: 0
+      Luck: 10000
+    - Stat: 3
+      AddType: 0
+      Luck: 10000
+    - Stat: 4
+      AddType: 0
+      Luck: 10000
+  - Quality: 1
+    NStatsToAdd: 1
+    StatLucks:
+    - Stat: 0
+      AddType: 0
+      Luck: 10000
+    - Stat: 1
+      AddType: 0
+      Luck: 10000
+    - Stat: 2
+      AddType: 0
+      Luck: 10000
+    - Stat: 3
+      AddType: 0
+      Luck: 10000
+    - Stat: 4
+      AddType: 0
+      Luck: 10000
+  - Quality: 2
+    NStatsToAdd: 1
+    StatLucks:
+    - Stat: 0
+      AddType: 0
+      Luck: 10000
+    - Stat: 1
+      AddType: 0
+      Luck: 10000
+    - Stat: 2
+      AddType: 0
+      Luck: 10000
+    - Stat: 3
+      AddType: 0
+      Luck: 10000
+    - Stat: 4
+      AddType: 0
+      Luck: 10000
+  - Quality: 3
+    NStatsToAdd: 1
+    StatLucks:
+    - Stat: 0
+      AddType: 1
+      Luck: 10000
+    - Stat: 1
+      AddType: 1
+      Luck: 10000
+    - Stat: 2
+      AddType: 1
+      Luck: 10000
+    - Stat: 3
+      AddType: 1
+      Luck: 10000
+    - Stat: 4
+      AddType: 1
+      Luck: 10000
+  - Quality: 4
+    NStatsToAdd: 2
+    StatLucks:
+    - Stat: 0
+      AddType: 1
+      Luck: 10000
+    - Stat: 1
+      AddType: 1
+      Luck: 10000
+    - Stat: 2
+      AddType: 1
+      Luck: 10000
+    - Stat: 3
+      AddType: 1
+      Luck: 10000
+    - Stat: 4
+      AddType: 1
+      Luck: 10000
+    - Stat: 6
+      AddType: 0
+      Luck: 10000
+    - Stat: 5
+      AddType: 0
+      Luck: 10000

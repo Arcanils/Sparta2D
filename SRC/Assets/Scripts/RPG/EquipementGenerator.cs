@@ -12,14 +12,13 @@ public class EquipementGenerator : ScriptableObject
 	{
 		var dataEquipement = Datas[UnityEngine.Random.Range(0, Datas.Length)];
 
-		RpgStats flatStats;
-		RpgStats coefStats;
+		RpgStats stats;
 		string name;
 
-		dataEquipement.GenereRandom(out flatStats, out coefStats, out name);
+		dataEquipement.GenereRandom(out stats, out name);
 
 
-		var str = name + "\n" + flatStats.ToString() + "\n" + coefStats.ToString();
+		var str = name + "\n" + stats.ToString(Enum.GetNames(typeof(Stat.EBaseStats)));
 
 		Debug.Log(str);
 	}

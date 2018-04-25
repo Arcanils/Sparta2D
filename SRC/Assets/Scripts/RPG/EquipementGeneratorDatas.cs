@@ -8,12 +8,28 @@ public class EquipementGeneratorDatas : ScriptableObject
 	public Equipement.EEquipement TypeEquipement;
 	public Sprite Icon;
 	public string Name;
-	public DataEquipementProduct[] Datas;
+	public DataEquipementProduct Datas;
 
-	public void GenereRandom(out RpgStats flatStats, out RpgStats coefStats, out string name)
+	public void GenereRandom(out RpgStats stats, out string name)
 	{
-		var subData = Datas[UnityEngine.Random.Range(0, Datas.Length)];
-		subData.GenereStats(out flatStats, out coefStats, out name);
+		Datas.GenereStats((Equipement.EQuality)Random.Range(0, System.Enum.GetNames(typeof(Equipement.EQuality)).Length), out stats, out name);
 		name = Name + " " + name;
 	}
+}
+
+[System.Serializable]
+public struct QualityStats
+{
+	public Equipement.EQuality Quality;
+	public int NStatsToAdd;
+	public StatLuck[] StatLucks;
+}
+
+[System.Serializable]
+public struct StatLuck
+{
+	public Stat.EBaseStats Stat;
+	public EAddType AddType;
+	[Range(0,10000)]
+	public int Luck;
 }
