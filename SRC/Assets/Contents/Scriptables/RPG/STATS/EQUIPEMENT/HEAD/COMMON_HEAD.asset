@@ -40,7 +40,16 @@ MonoBehaviour:
   - StatSelected: 0
     MinValue: 5
     MaxValue: 10
+  - StatSelected: 1
+    MinValue: 5
+    MaxValue: 10
   - StatSelected: 2
+    MinValue: 5
+    MaxValue: 10
+  - StatSelected: 3
+    MinValue: 5
+    MaxValue: 10
+  - StatSelected: 4
     MinValue: 5
     MaxValue: 10
   QualityStatsToSelect:

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using UnityEngine;
 
 
@@ -121,6 +122,23 @@ public class Entity
 	public BuffStats[] Buffs;
 	public Stats CurrentStats;
 
+	public float PhysicsDMG
+	{
+		get { return GetData(Stat.EBaseStats.PHYSICS_DMG); }
+	}
+	public float MagicDMG
+	{
+		get { return GetData(Stat.EBaseStats.MAGIC_DMG); }
+	}
+	public float PhysicsRes
+	{
+		get { return GetData(Stat.EBaseStats.PHYSICS_RES); }
+	}
+	public float MagicRes
+	{
+		get { return GetData(Stat.EBaseStats.MAGIC_RES); }
+	}
+
 	//CalculStatsFinal;
 	//CalculStatsFinalWithoutBuff
 	//TickBuff
@@ -128,6 +146,12 @@ public class Entity
 	//Get Damage Physique / Magic
 	// Inflict Damage 
 	// Get Current HP
+
+	private float GetData(Stat.EBaseStats typeData)
+	{
+		var value = (int)typeData;
+		return CurrentStats.Values.FirstOrDefault(data => data.Key == value).Value;
+	}
 }
 
 public class BuffStats

@@ -74,7 +74,7 @@ public struct StatRandomProperty
 	public Stat Generate()
 	{
 		var randomValue = UnityEngine.Random.Range(MinValue, MaxValue);
-		Debug.LogWarning(StatSelected + " " + randomValue);
+		Debug.LogWarning(StatSelected + " " + MinValue + " " + randomValue + MaxValue);
 		return new Stat((int)StatSelected, randomValue);
 	}
 }

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 
 	private static string keyHorizontal = "Horizontal";
 	private static string keyVertical = "Vertical";
+	private static string keyAttack = "Fire1";
 
 	private void Awake()
 	{
@@ -22,6 +23,11 @@ public class PlayerController : MonoBehaviour {
 		if (moveDir != Vector2.zero)
 			moveDir.Normalize();
 
-		_pawn.Move(moveDir);
+		_pawn.InputMove(moveDir);
+
+		if (Input.GetButtonDown(keyAttack))
+			_pawn.InputAttack(true);
+		if (Input.GetButtonUp(keyAttack))
+			_pawn.InputAttack(false);
 	}
 }
