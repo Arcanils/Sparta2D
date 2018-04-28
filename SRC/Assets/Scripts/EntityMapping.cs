@@ -31,13 +31,13 @@ public class EntityMapping : MonoBehaviour {
 		_entitiesToTrack.Add(entity);
 	}
 
-	public EntityComponent[] HitInRect(Rect rect)
+	public EntityComponent[] HitInRect(RectOriented rect)
 	{
 		var hitted = new List<IMapCollision>();
 
 		var pos = new Vector2Int();
-		var bl = rect.min + SizeMap;
-		var tr = rect.max + SizeMap;
+		var bl = rect.BLContainerPointOriented + SizeMap;
+		var tr = rect.TRContainerPointOriented + SizeMap;
 
 
 		var begX = (int)(bl.x / NCollumns);
@@ -67,7 +67,7 @@ public class EntityMapping : MonoBehaviour {
 		if (hitted.Count == 0)
 			return null;
 
-		var dataUniqueHit = hitted.Distinct().Where(item => rect.Overlaps(item.GetRectCollision(), true));
+		var dataUniqueHit = hitted.Distinct().Where(item => RectOriented.Overlaps(rect, item.GetRectCollision()));
 
 		if (dataUniqueHit == null)
 			return null;
@@ -108,4 +108,100 @@ public interface IMapCollision
 {
 	Rect GetRectCollision();
 	EntityComponent GetEntity();
+}
+
+public struct RectOriented
+{
+	public readonly Vector2[] OrientedPoints;
+	public readonly Vector2 BLContainerPointOriented;
+	public readonly Vector2 TRContainerPointOriented;
+	public readonly Rect OriginRect;
+	public readonly Quaternion Rotation;
+	public readonly Vector3 OriginePivot;
+
+	public RectOriented(Rect rectOrigin, Quaternion rotation, Vector3 originPivot)
+	{
+		OriginRect = rectOrigin;
+		Rotation = rotation;
+		OriginePivot = originPivot;
+
+		var rect = OriginRect;
+		rect.x -= originPivot.x;
+		rect.y -= originPivot.y;
+
+		OrientedPoints = new Vector2[]
+		{
+			(rotation * new Vector2(rect.x, rect.y)) + originPivot,
+			(rotation * new Vector2(rect.x + rect.width, rect.y)) + originPivot,
+			(rotation * new Vector2(rect.x, rect.y + rect.height)) + originPivot,
+			(rotation * new Vector2(rect.x + rect.width, rect.y + rect.height)) + originPivot,
+		};
+		Vector2 min = OrientedPoints[0];
+		Vector2 max = OrientedPoints[0];
+
+		for (int i = 1; i < 4; i++)
+		{
+			if (min.x > OrientedPoints[i].x)
+				min.x = OrientedPoints[i].x;
+			else if (max.x < OrientedPoints[i].x)
+				max.x = OrientedPoints[i].x;
+
+			if (min.y > OrientedPoints[i].y)
+				min.y = OrientedPoints[i].y;
+			else if (max.y < OrientedPoints[i].y)
+				max.y = OrientedPoints[i].y;
+		}
+
+		BLContainerPointOriented = min;
+		TRContainerPointOriented = max;
+	}
+
+	public override string ToString()
+	{
+		string str = "";
+		str += "OriginePivot : " + OriginePivot.ToString() + "\n" +
+			"OriginRect : " + OriginRect.ToString() + "\n" +
+			"Rotation : " + Rotation.ToString() + "\n" +
+			"BLContainerPointOriented : " + BLContainerPointOriented.ToString() + "\n" +
+			"TRContainerPointOriented : " + TRContainerPointOriented.ToString() + "\n";
+
+		for (int i = 0; i < 4; i++)
+		{
+			str += "OrientedPoints[" + i + "] : " + OrientedPoints[i].ToString() + "\n";
+		}
+
+		return str;
+	}
+
+	public static bool Overlaps (RectOriented rectOriented, Rect target)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (target.Contains(rectOriented.OrientedPoints[i], true))
+				return true;
+		}
+
+		var points = GetPointsRect(target);
+		var inverRotation = Quaternion.Inverse(rectOriented.Rotation);
+		for (int i = 0; i < 4; i++)
+		{
+			points[i].x -= rectOriented.OriginePivot.x;
+			points[i].y -= rectOriented.OriginePivot.y;
+			Vector2 pointRect = (inverRotation * points[i]) + rectOriented.OriginePivot;
+			if (rectOriented.OriginRect.Contains(pointRect))
+				return true;
+		}
+		return false;
+	}
+
+	private static Vector2[] GetPointsRect(Rect rect)
+	{
+		return new Vector2[]
+		{
+			new Vector2(rect.x, rect.y),
+			new Vector2(rect.x + rect.width, rect.y),
+			new Vector2(rect.x, rect.y + rect.height),
+			new Vector2(rect.x + rect.width, rect.y + rect.height),
+		};
+	}
 }

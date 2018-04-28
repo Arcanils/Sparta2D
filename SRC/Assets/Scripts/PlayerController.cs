@@ -6,10 +6,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
 
-	private PawnComponent _pawn;
+	private PawnComponent _pawn; 
 
 	private static string keyHorizontal = "Horizontal";
 	private static string keyVertical = "Vertical";
+	private static string keyHorizontalAttack = "HorizontalAttack";
+	private static string keyVeticalAttack = "VerticalAttack";
 	private static string keyAttack = "Fire1";
 
 	private void Awake()
@@ -24,6 +26,12 @@ public class PlayerController : MonoBehaviour {
 			moveDir.Normalize();
 
 		_pawn.InputMove(moveDir);
+
+		var attackDir = new Vector2(Input.GetAxisRaw(keyHorizontalAttack), Input.GetAxisRaw(keyVeticalAttack));
+		if (attackDir != Vector2.zero)
+			attackDir.Normalize();
+
+		_pawn.InputDirAttack(attackDir);
 
 		if (Input.GetButtonDown(keyAttack))
 			_pawn.InputAttack(true);

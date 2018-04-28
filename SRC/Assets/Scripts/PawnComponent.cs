@@ -21,8 +21,6 @@ public class PawnComponent : MonoBehaviour {
 		AttackData.Tick(delta);
 	}
 
-
-
 	public void InputMove(Vector2 dir)
 	{
 		MoveData.SetDirection(dir);
@@ -31,6 +29,11 @@ public class PawnComponent : MonoBehaviour {
 	public void InputAttack(bool launchAttack)
 	{
 		AttackData.SetInputAttack(launchAttack);
+	}
+
+	public void InputDirAttack(Vector2 dir)
+	{
+		AttackData.SetDirectionAttack(dir);
 	}
 }
 
@@ -98,6 +101,11 @@ public class AttackBehaviour : AbstractPawnBehaviour, IInflictDmg
 	public void SetInputAttack(bool inputAttack)
 	{
 		_inputAttack = inputAttack;
+	}
+
+	public void SetDirectionAttack(Vector2 dir)
+	{
+		RefAttack.SetDirAttack(dir);
 	}
 
 	public void InflictDmg(EntityComponent entity)

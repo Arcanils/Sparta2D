@@ -5,14 +5,28 @@ using UnityEngine;
 
 public class AttackCollider : MonoBehaviour {
 
-	private Collider2D _col;
+	public Rect RectCollision;
+	
 	private IInflictDmg _inflictDMG;
+	private IPivotAttack _pivotAttack;
 	private Coroutine _routine;
-
-	public void Init(IInflictDmg inflictDMG)
+	private Transform _trans;
+	private Vector3 _orgine;
+	
+	private void OnDrawGizmosSelected()
 	{
-		_col = GetComponent<Collider2D>();
+		Gizmos.DrawCube(transform.position + new Vector3(RectCollision.x, RectCollision.y), Vector3.one * 0.1f);
+		Gizmos.DrawCube(transform.position + new Vector3(RectCollision.x + RectCollision.size.x, RectCollision.y), Vector3.one * 0.1f);
+		Gizmos.DrawCube(transform.position + new Vector3(RectCollision.x, RectCollision.y + RectCollision.size.y), Vector3.one * 0.1f);
+		Gizmos.DrawCube(transform.position + new Vector3(RectCollision.x + RectCollision.size.x, RectCollision.y + RectCollision.size.y), Vector3.one * 0.1f);
+	}
+
+	public void Init(IInflictDmg inflictDMG, IPivotAttack pivotAttack)
+	{
+		_trans = transform;
+		_pivotAttack = pivotAttack;
 		_inflictDMG = inflictDMG;
+		_orgine = _trans.position - pivotAttack.GetPosition();
 	}
 
 	public void SetActiveAttack(bool enable)
@@ -27,7 +41,10 @@ public class AttackCollider : MonoBehaviour {
 	{
 		while (true)
 		{
-			var hits = EntityMapping.Instance.HitInRect(new Rect(_col.bounds.min, _col.bounds.max));
+			var rect = new Rect(RectCollision);
+			rect.x += _pivotAttack.GetPosition().x + _orgine.x;
+			rect.y += _pivotAttack.GetPosition().y + _orgine.y;
+			var hits = EntityMapping.Instance.HitInRect(new RectOriented(rect, _pivotAttack.GetRotation(), _pivotAttack.GetPosition()));
 
 			if (hits != null)
 			{
@@ -49,4 +66,10 @@ public class AttackCollider : MonoBehaviour {
 		_inflictDMG.InflictDmg(script);
 	}
 	*/
+}
+
+public interface IPivotAttack
+{
+	Quaternion GetRotation();
+	Vector3 GetPosition();
 }

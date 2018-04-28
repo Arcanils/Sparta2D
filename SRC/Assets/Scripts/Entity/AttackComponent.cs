@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackComponent : MonoBehaviour {
+public class AttackComponent : MonoBehaviour, IPivotAttack
+{
 
 	public AttackCollider Weapon;
 	public Transform AttackContainer;
@@ -12,7 +13,7 @@ public class AttackComponent : MonoBehaviour {
 
 	public void Init(IInflictDmg inflictDmg)
 	{
-		Weapon.Init(inflictDmg);
+		Weapon.Init(inflictDmg, this);
 	}
 
 	public void StartAttack()
@@ -24,6 +25,13 @@ public class AttackComponent : MonoBehaviour {
 		_routine = StartCoroutine(AttackEnum());
 	}
 
+	public void SetDirAttack(Vector2 dir)
+	{
+		float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+		AttackContainer.rotation = Quaternion.Euler(0f, 0f, angle);
+	}
+
 	private IEnumerator AttackEnum()
 	{
 		Debug.Log("Attack");
@@ -31,5 +39,15 @@ public class AttackComponent : MonoBehaviour {
 		yield return new WaitForSeconds(0.2f);
 		Weapon.SetActiveAttack(false);
 		_routine = null;
+	}
+
+	Quaternion IPivotAttack.GetRotation()
+	{
+		return AttackContainer.rotation;
+	}
+
+	Vector3 IPivotAttack.GetPosition()
+	{
+		return AttackContainer.position;
 	}
 }
