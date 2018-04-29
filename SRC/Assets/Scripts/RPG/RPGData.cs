@@ -113,6 +113,11 @@ public class EntityConfig
 {
 	public Stats BaseStats;
 	public Stats GainBaseStatsByLvl;
+
+	public Stats GetStats()
+	{
+		return BaseStats;
+	}
 }
 
 public class Entity
@@ -147,6 +152,14 @@ public class Entity
 	// Inflict Damage 
 	// Get Current HP
 
+	public void CalculFinalStats()
+	{
+		var baseEntityStats = EntityData.GetStats();
+		var equipementStats = Equipements.GetStats();
+
+		equipementStats.FlatStats.AddStats(baseEntityStats);
+	}
+
 	private float GetData(Stat.EBaseStats typeData)
 	{
 		var value = (int)typeData;
@@ -178,6 +191,28 @@ public class EntityEquipement
 	public Equipement Ring2;
 	public Equipement RightHand;
 	public Equipement LeftHand;
+
+	public RpgStats GetStats()
+	{
+		List<Stat> baseStats = new List<Stat>();
+		List<Stat> coefStats = new List<Stat>();
+		if (Head != null)
+			Head.GetStats(baseStats, coefStats);
+		if (Chest != null)
+			Chest.GetStats(baseStats, coefStats);
+		if (Legs != null)
+			Legs.GetStats(baseStats, coefStats);
+		if (Ring1 != null)
+			Ring1.GetStats(baseStats, coefStats);
+		if (Ring2 != null)
+			Ring2.GetStats(baseStats, coefStats);
+		if (RightHand != null)
+			RightHand.GetStats(baseStats, coefStats);
+		if (LeftHand != null)
+			LeftHand.GetStats(baseStats, coefStats);
+
+		return new RpgStats(new Stats(baseStats.ToArray()), new Stats(coefStats.ToArray()));
+	}
 }
 
 public class Equipement
@@ -205,6 +240,12 @@ public class Equipement
 	public EEquipement Type;
 	public EQuality Quality;
 	public RpgStats Stats;
+
+	public void GetStats(List<Stat> flatValues, List<Stat> coefStats)
+	{
+		flatValues.AddRange(Stats.FlatStats.Values);
+		coefStats.AddRange(Stats.CoefStats.Values);
+	}
 }
 // BaseStatsFinal = BaseStats + BonusFlatBaseStats + BaseStats * BonusCoefBaseStats
 // ItemsStatsFinal = Foreach ( itemStats)
