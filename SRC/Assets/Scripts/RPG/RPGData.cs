@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 
+[Serializable]
 public struct RpgStats
 {
 	public Stats FlatStats;
@@ -23,6 +24,7 @@ public struct RpgStats
 	}
 }
 
+[Serializable]
 public struct Stats
 {
 	public Stat[] Values;
@@ -51,7 +53,21 @@ public struct Stats
 			return;
 		}
 	}
+	public void MultiplyStat(Stat stat)
+	{
+		MultiplyStat(stat.Key, stat.Value);
+	}
+	public void MultiplyStat(int indexStat, float value)
+	{
+		for (int i = Values.Length - 1; i >= 0; --i)
+		{
+			if (Values[i].Key != indexStat)
+				continue;
 
+			Values[indexStat].Value *= value;
+			return;
+		}
+	}
 	public string ToString(string[] namesStats = null)
 	{ 
 		var txt = new StringBuilder();
@@ -62,6 +78,32 @@ public struct Stats
 
 		return txt.ToString();
 	}
+
+	public void SetStats(int indexStat, float value)
+	{
+		for (int i = Values.Length - 1; i >= 0; --i)
+		{
+			if (Values[i].Key != indexStat)
+				continue;
+
+			Values[indexStat].Value = value;
+			return;
+		}
+	}
+
+
+	public static Stats EmptyStats(float defaultValue = 0f)
+	{
+		var stats = new Stat[Enum.GetNames(typeof(Stat.EBaseStats)).Length];
+		for (int i = stats.Length - 1; i >= 0; --i)
+		{
+			stats[i] = new Stat(i, defaultValue);
+		}
+
+		return new Stats(stats);
+	}
+
+
 }
 
 
@@ -71,6 +113,7 @@ public enum EAddType
 	MULTIPLI,
 }
 
+[Serializable]
 public struct Stat
 {
 	public enum EBaseStats
@@ -102,6 +145,7 @@ public struct Stat
 	}
 }
 
+[Serializable]
 public struct StatClamp
 {
 	public Stat Value;
@@ -109,6 +153,7 @@ public struct StatClamp
 	public float Max;
 }
 
+[Serializable]
 public class EntityConfig
 {
 	public Stats BaseStats;
@@ -120,6 +165,7 @@ public class EntityConfig
 	}
 }
 
+[Serializable]
 public class Entity
 {
 	public EntityConfig EntityData;
@@ -143,6 +189,10 @@ public class Entity
 	{
 		get { return GetData(Stat.EBaseStats.MAGIC_RES); }
 	}
+	public float HP
+	{
+		get { return GetData(Stat.EBaseStats.HP); }
+	}
 
 	//CalculStatsFinal;
 	//CalculStatsFinalWithoutBuff
@@ -154,12 +204,79 @@ public class Entity
 
 	public void CalculFinalStats()
 	{
+		CurrentStats = Stats.EmptyStats();
 		var baseEntityStats = EntityData.GetStats();
 		var equipementStats = Equipements.GetStats();
 
-		equipementStats.FlatStats.AddStats(baseEntityStats);
-	}
+		CurrentStats.AddStats(baseEntityStats);
+		CurrentStats.AddStats(equipementStats.FlatStats);
 
+		var coefStats = Stats.EmptyStats(1f);
+		coefStats.AddStats(equipementStats.CoefStats);
+
+
+		for (int i = (int)Stat.EBaseStats.LUCK; i >= 0; --i)
+		{
+			CurrentStats.MultiplyStat(coefStats.Values[i]);
+		}
+
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.PHYSICS_RES, GetData(Stat.EBaseStats.STRENGTH) * COEF_STR_PHYS_RES);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.PHYSICS_DMG, GetData(Stat.EBaseStats.STRENGTH) * COEF_STR_PHYS_DMG);
+
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.ATTACK_SPEED, GetData(Stat.EBaseStats.DEXTERITY) * COEF_DEX_AS);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.SPEED, GetData(Stat.EBaseStats.DEXTERITY) * COEF_DEX_SPEED);
+
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.HP, GetData(Stat.EBaseStats.VITALITY) * COEF_VIT_HP);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.MAGIC_RES, GetData(Stat.EBaseStats.VITALITY) * COEF_VIT_PHYS_RES);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.PHYSICS_RES, GetData(Stat.EBaseStats.VITALITY) * COEF_VIT_MAGIC_RES);
+
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.MAGIC_RES, GetData(Stat.EBaseStats.WISDOM) * COEF_WIS_MAGIC_RES);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.MAGIC_DMG, GetData(Stat.EBaseStats.WISDOM) * COEF_WIS_MAGIC_DMG);
+
+
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.DROP_RATE, GetData(Stat.EBaseStats.LUCK) * COEF_LUC_DROP_RATE);
+		CurrentStats.AddBaseStat((int)Stat.EBaseStats.COEF_CRIT, GetData(Stat.EBaseStats.LUCK) * COEF_LUC_CRIT);
+
+		for (int i = (int)Stat.EBaseStats.LUCK + 1, iLength = (int)Stat.EBaseStats.HP + 1; i < iLength; ++i)
+		{
+			CurrentStats.MultiplyStat(coefStats.Values[i]);
+		}
+
+	}
+	private const float COEF_STR_PHYS_RES = 0.2f;
+	private const float COEF_STR_PHYS_DMG = 1f;
+
+	private const float COEF_DEX_AS = 1f;
+	private const float COEF_DEX_SPEED = 1f;
+
+	private const float COEF_VIT_HP = 5f;
+	private const float COEF_VIT_PHYS_RES = 0.1f;
+	private const float COEF_VIT_MAGIC_RES = 0.1f;
+
+	private const float COEF_WIS_MAGIC_RES = 0.2f;
+	private const float COEF_WIS_MAGIC_DMG = 1f;
+
+	private const float COEF_LUC_DROP_RATE = 0.5f;
+	private const float COEF_LUC_CRIT = 0.5f;
+
+	/*
+		STRENGTH,
+		DEXTERITY,
+		VITALITY,
+		WISDOM,
+		LUCK,
+		PHYSICS_RES,
+		PHYSICS_DMG ,
+		MAGIC_RES,
+		MAGIC_DMG,
+		COEF_CRIT,
+		COEF_CRIT_DMG_MULTIPLIER,
+		ATTACK_SPEED,
+		COOLDOWN_REDUCTION,
+		SPEED,
+		DROP_RATE,
+		HP,
+		*/
 	private float GetData(Stat.EBaseStats typeData)
 	{
 		var value = (int)typeData;
@@ -167,6 +284,7 @@ public class Entity
 	}
 }
 
+[Serializable]
 public class BuffStats
 {
 	public enum EBuff
@@ -182,6 +300,7 @@ public class BuffStats
 	public float Duration;
 }
 
+[Serializable]
 public class EntityEquipement
 {
 	public Equipement Head;
@@ -270,3 +389,4 @@ public class Equipement
 // HP
 //CoefReductionDmg = StatsRes Evaluate sur Curve
 // DamageReceive = (FlatDamage  - FlatReduction ) * (1 - CoefReduction Damage)
+																			  
