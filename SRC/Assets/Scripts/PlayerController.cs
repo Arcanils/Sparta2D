@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour {
 	private static string keyVertical = "Vertical";
 	private static string keyHorizontalAttack = "HorizontalAttack";
 	private static string keyVeticalAttack = "VerticalAttack";
-	private static string keyAttack = "Fire1";
+	private static string keyBind1 = "Fire1";
+	private static string keyBind2 = "Fire2";
 
 	private void Awake()
 	{
@@ -33,9 +34,14 @@ public class PlayerController : MonoBehaviour {
 
 		_pawn.InputDirAttack(attackDir);
 
-		if (Input.GetButtonDown(keyAttack))
-			_pawn.InputAttack(true);
-		if (Input.GetButtonUp(keyAttack))
-			_pawn.InputAttack(false);
+		if (Input.GetButtonDown(keyBind1))
+			_pawn.CallInputBinded(0, true);
+		if (Input.GetButtonUp(keyBind1))
+			_pawn.CallInputBinded(0, false);
+
+		if (Input.GetButtonDown(keyBind2))
+			_pawn.CallInputBinded(1, true);
+		if (Input.GetButtonUp(keyBind2))
+			_pawn.CallInputBinded(1, false);
 	}
 }
