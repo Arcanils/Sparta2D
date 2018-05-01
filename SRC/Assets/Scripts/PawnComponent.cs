@@ -20,9 +20,10 @@ public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
 		MoveData.Init(transform);
 		AttackData.Init(transform);
 		_cmds = new BaseCommande[SpawnData.Length];
+		var iEntity = GetComponent<IEntity>();
 		for (int i = 0; i < _cmds.Length; i++)
 		{
-			_cmds[i] = new CommandeAttackDistance(this, this, SpawnData[i]);
+			_cmds[i] = new CommandeAttackDistance(this, this, iEntity, SpawnData[i]);
 		}
 	}
 
@@ -53,7 +54,6 @@ public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
 
 	public void CallInputBinded(int indexInput, bool input)
 	{
-		Debug.LogWarning(indexInput + " " + input);
 		_cmds[indexInput].InputExecute(input);
 	}
 
@@ -217,30 +217,54 @@ public abstract class CommandeSpawnObect : BaseCommande
 
 public class CommandeAttackDistance : CommandeSpawnObect
 {
-	public CommandeAttackDistance(IGlobalCooldown iGlobalCooldown, IPawn iPawn, SpawnObjectData spawnObjectData) :
+	private IEntity _iEntity;
+
+	public CommandeAttackDistance(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
+		SpawnObjectData spawnObjectData) :
 		base(iGlobalCooldown, iPawn, spawnObjectData)
 	{
+		_iEntity = iEntity;
 	}
 
 	protected override void Execute()
 	{
 		_timerCooldown = _spawnObjectData.Cooldown;
 		var obj = _iPawn.SpawnObect(_spawnObjectData.Prefab, _iPawn.GetPosition(), _iPawn.GetRotation());
+		var script = obj.GetComponent<ProjectileComponent>();
+		if (script != null)
+		{
+			script.Damage = _iEntity.GetAmountDamage();
+		}
 	}
 }
 
 public class CommandeAttackCac: CommandeSpawnObect
 {
-	public CommandeAttackCac(IGlobalCooldown iGlobalCooldown, IPawn iPawn, SpawnObjectData spawnObjectData) :
+	private IEntity _iEntity;
+
+	public CommandeAttackCac(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
+		SpawnObjectData spawnObjectData) :
 		base(iGlobalCooldown, iPawn, spawnObjectData)
 	{
+		_iEntity = iEntity;
 	}
 
 	protected override void Execute()
 	{
 		_timerCooldown = _spawnObjectData.Cooldown;
 		var obj = _iPawn.SpawnObect(_spawnObjectData.Prefab, _iPawn.GetPosition(), _iPawn.GetRotation());
+		var script = obj.GetComponent<ProjectileComponent>();
+		if (script != null)
+		{
+			script.Damage = _iEntity.GetAmountDamage();
+		}
 	}
+}
+
+public interface IEntity
+{
+	void ReceiveDamage(float damage);
+	float GetAmountDamage();
 }
 
 public interface IGlobalCooldown

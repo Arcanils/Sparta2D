@@ -7,6 +7,8 @@ public class ProjectileComponent : MonoBehaviour {
 	public float Speed;
 	public bool Bounce;
 	public int NBounce = 2;
+	public float Damage;
+
 	private Transform _trans;
 	private Vector2 _dir;
 	private int _bounceLeft;
@@ -48,17 +50,17 @@ public class ProjectileComponent : MonoBehaviour {
 
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
-		/*
-		if (collision.transform.tag == "Player")
+		var entityComp = collision.transform.GetComponent<IEntity>();
+		if (entityComp != null)
 		{
-			var script = collision.transform.GetComponent<PawnComponent>();
-
-			if (script != null)
-				script.HitMe();
+			entityComp.ReceiveDamage(Damage);
 			DestroyBullet();
 			return;
 		}
-		*/
+		else
+		{
+			Debug.LogWarning("Failed to inflict dmg");
+		}
 
 		if (_bounceLeft <= 0)
 		{
