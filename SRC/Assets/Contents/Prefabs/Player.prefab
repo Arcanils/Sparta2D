@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4978106972956986}
   - component: {fileID: 212933948762848690}
+  - component: {fileID: 114978429383829694}
   m_Layer: 8
   m_Name: Graph
   m_TagString: Untagged
@@ -225,6 +226,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveData:
     SpeedMove: 10
+  Anim: {fileID: 0}
+--- !u!114 &114978429383829694
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1976878185677706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 584f77e24c648414193345d8c910a098, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartAnim: Bottom
+  AnimDatas:
+  - Key: Bottom
+    Value:
+      Frames:
+      - {fileID: 21300000, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300002, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300004, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300002, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      Duration: 1
+      Loop: 1
+      InverseX: 0
+      InverseY: 0
+  - Key: Right
+    Value:
+      Frames:
+      - {fileID: 21300024, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300026, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300028, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300026, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      Duration: 1
+      Loop: 1
+      InverseX: 1
+      InverseY: 0
+  - Key: Left
+    Value:
+      Frames:
+      - {fileID: 21300024, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300026, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300028, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300026, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      Duration: 1
+      Loop: 1
+      InverseX: 0
+      InverseY: 0
+  - Key: Top
+    Value:
+      Frames:
+      - {fileID: 21300072, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300074, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300076, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      - {fileID: 21300074, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
+      Duration: 1
+      Loop: 1
+      InverseX: 0
+      InverseY: 0
+  Target: {fileID: 212933948762848690}
 --- !u!212 &212538577269200190
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -303,7 +363,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 75eeeacb27163a5438886e154aec1009, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ba483088da3c1ae41a303de1acb3f4a1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
