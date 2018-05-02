@@ -207,7 +207,7 @@ public abstract class CommandeSpawnObect : BaseCommande
 	protected IPawn _iPawn;
 	protected SpawnObjectData _spawnObjectData;
 
-	public CommandeSpawnObect(IGlobalCooldown iGlobalCooldown, IPawn iPawn ,SpawnObjectData spawnObjectData) : base(iGlobalCooldown)
+	protected CommandeSpawnObect(IGlobalCooldown iGlobalCooldown, IPawn iPawn ,SpawnObjectData spawnObjectData) : base(iGlobalCooldown)
 	{
 		_spawnObjectData = spawnObjectData;
 		_iPawn = iPawn;
@@ -222,7 +222,7 @@ public abstract class CommandeSpawnObect : BaseCommande
 
 public class CommandeAttackDistance : CommandeSpawnObect
 {
-	private IEntity _iEntity;
+	private readonly IEntity _iEntity;
 
 	public CommandeAttackDistance(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
 		SpawnObjectData spawnObjectData) :
@@ -245,7 +245,7 @@ public class CommandeAttackDistance : CommandeSpawnObect
 
 public class CommandeAttackCac: CommandeSpawnObect
 {
-	private IEntity _iEntity;
+	private readonly IEntity _iEntity;
 
 	public CommandeAttackCac(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
 		SpawnObjectData spawnObjectData) :
