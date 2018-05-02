@@ -259,6 +259,12 @@ public class Entity
 	private const float COEF_LUC_DROP_RATE = 0.5f;
 	private const float COEF_LUC_CRIT = 0.5f;
 
+	public Entity(EntityDataConfig entityData, EntityEquipement equipementsData)
+	{
+		EntityData = entityData;
+		Equipements = equipementsData;
+	}
+
 	/*
 		STRENGTH,
 		DEXTERITY,

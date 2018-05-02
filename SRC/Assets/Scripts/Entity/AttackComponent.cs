@@ -11,9 +11,9 @@ public class AttackComponent : MonoBehaviour, IPivotAttack
 
 	private Coroutine _routine;
 
-	public void Init(IInflictDmg inflictDmg)
+	public void Init()
 	{
-		Weapon.Init(inflictDmg, this);
+		Weapon.Init(this);
 	}
 
 	public void StartAttack()

@@ -2,45 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
+public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision
 {
-	public SpawnObjectData[] SpawnData;
-
 	public MoveBehaviour MoveData;
-	public AttackBehaviour AttackData;
 
-	public BaseCommande[] _cmds;
+	private EntityComponent _entity;
+	private BaseCommande[] _cmds;
 
 	private Transform _trans;
 	private Quaternion _rotationAttack;
-
-	private void Awake()
-	{
-		_trans = transform;
-		MoveData.Init(transform);
-		AttackData.Init(transform);
-		_cmds = new BaseCommande[SpawnData.Length];
-		var iEntity = GetComponent<IEntity>();
-		for (int i = 0; i < _cmds.Length; i++)
-		{
-			_cmds[i] = new CommandeAttackDistance(this, this, iEntity, SpawnData[i]);
-		}
-	}
-
-	private void FixedUpdate()
-	{
-		var delta = Time.deltaTime;
-		MoveData.Tick(delta);
-
-		for (int i = 0; i < _cmds.Length; i++)
-		{
-			_cmds[i].Tick(delta);
-		}
-	}
+	private Collider2D _col;
 
 	public void Init(PawnStructConfig config)
 	{
+		_trans = transform;
+		_col = GetComponent<Collider2D>();
+		MoveData.Init(transform);
 
+		_entity = config.GetEntity();
+		_entity.Init(this);
+		_cmds = config.GetPawnCmds(this, _entity);
+
+		EntityMapping.Instance.AddEntity(this);
+	}
+
+	public void TickMove(float deltaTime)
+	{
+		MoveData.Tick(deltaTime);
+	}
+
+	public void TickCmds(float deltaTime)
+	{
+		for (int i = 0, iLength = _cmds.Length; i < iLength; i++)
+		{
+			_cmds[i].Tick(deltaTime);
+		}
 	}
 
 	public void InputMove(Vector2 dir)
@@ -50,8 +46,6 @@ public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
 
 	public void InputDirAttack(Vector2 dir)
 	{
-		//AttackData.SetDirectionAttack(dir);
-
 		float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
 		_rotationAttack = Quaternion.Euler(0f, 0f, angle);
@@ -62,27 +56,43 @@ public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
 		_cmds[indexInput].InputExecute(input);
 	}
 
-	Quaternion IPawn.GetRotation()
+	Quaternion ICommandUtils.GetRotation()
 	{
 		return _rotationAttack;
 	}
 
-	Vector3 IPawn.GetPosition()
+	Vector3 ICommandUtils.GetPosition()
 	{
 		return _trans.position;
 	}
 
-	GameObject IPawn.SpawnObect(GameObject prefab, Vector3 pos, Quaternion rot)
+	GameObject ICommandUtils.SpawnObect(GameObject prefab, Vector3 pos, Quaternion rot)
 	{
 		return GameObject.Instantiate<GameObject>(prefab, pos, rot);
 	}
 
-	void IGlobalCooldown.SetGlobalCooldown(float duration)
+	void ICommandUtils.SetGlobalCooldown(float duration)
 	{
 		for (int i = 0; i < _cmds.Length; i++)
 		{
 			_cmds[i].SetGlobalCooldown(duration);
 		}
+	}
+
+	void IDeath.OnDeath()
+	{
+		EntityMapping.Instance.RemoveEntity(this);
+		Destroy(gameObject);
+	}
+
+	Rect IPawnCollision.GetRectCollision()
+	{
+		return new Rect(_col.bounds.min, _col.bounds.size);
+	}
+
+	public IEntity GetEntity()
+	{
+		return _entity;
 	}
 }
 
@@ -124,7 +134,7 @@ public class MoveBehaviour : AbstractPawnBehaviour
 }
 
 [System.Serializable]
-public class AttackBehaviour : AbstractPawnBehaviour, IInflictDmg
+public class AttackBehaviour : AbstractPawnBehaviour
 {
 	public AttackComponent RefAttackCac;
 
@@ -136,7 +146,7 @@ public class AttackBehaviour : AbstractPawnBehaviour, IInflictDmg
 	{
 		_entity = trans.GetComponent<EntityComponent>();
 		if (RefAttackCac != null)
-			RefAttackCac.Init(this);
+			RefAttackCac.Init();
 	}
 
 	public override void Tick(float deltaTime)
@@ -164,107 +174,6 @@ public class AttackBehaviour : AbstractPawnBehaviour, IInflictDmg
 	}
 }
 
-public abstract class BaseCommande
-{
-	protected IGlobalCooldown _iGlobalCooldown;
-	protected float _timerCooldown;
-	protected bool _executeCmd;
-
-	public BaseCommande(IGlobalCooldown iGlobalCooldown)
-	{
-		_iGlobalCooldown = iGlobalCooldown;
-	}
-
-	public void InputExecute(bool input)
-	{
-		_executeCmd = input;
-	}
-	public void Tick(float deltaTime)
-	{
-		_timerCooldown -= deltaTime;
-		if (_executeCmd && _timerCooldown < 0f)
-		{
-			_timerCooldown = 2f;
-			Execute();
-			_iGlobalCooldown.SetGlobalCooldown();
-		}
-		_executeCmd = false;
-	}
-
-	public void SetGlobalCooldown(float duration)
-	{
-		if (_timerCooldown < duration)
-		{
-			_timerCooldown = duration;
-		}
-	}
-
-	protected abstract void Execute();
-}
-
-public abstract class CommandeSpawnObect : BaseCommande
-{
-	protected IPawn _iPawn;
-	protected SpawnObjectData _spawnObjectData;
-
-	protected CommandeSpawnObect(IGlobalCooldown iGlobalCooldown, IPawn iPawn ,SpawnObjectData spawnObjectData) : base(iGlobalCooldown)
-	{
-		_spawnObjectData = spawnObjectData;
-		_iPawn = iPawn;
-	}
-
-	protected override void Execute()
-	{
-		_timerCooldown = _spawnObjectData.Cooldown;
-		_iPawn.SpawnObect(_spawnObjectData.Prefab, _iPawn.GetPosition(), _iPawn.GetRotation());
-	}
-}
-
-public class CommandeAttackDistance : CommandeSpawnObect
-{
-	private readonly IEntity _iEntity;
-
-	public CommandeAttackDistance(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
-		SpawnObjectData spawnObjectData) :
-		base(iGlobalCooldown, iPawn, spawnObjectData)
-	{
-		_iEntity = iEntity;
-	}
-
-	protected override void Execute()
-	{
-		_timerCooldown = _spawnObjectData.Cooldown;
-		var obj = _iPawn.SpawnObect(_spawnObjectData.Prefab, _iPawn.GetPosition(), _iPawn.GetRotation());
-		var script = obj.GetComponent<ProjectileComponent>();
-		if (script != null)
-		{
-			script.Damage = _iEntity.GetAmountDamage();
-		}
-	}
-}
-
-public class CommandeAttackCac: CommandeSpawnObect
-{
-	private readonly IEntity _iEntity;
-
-	public CommandeAttackCac(IGlobalCooldown iGlobalCooldown, IPawn iPawn, IEntity iEntity,
-		SpawnObjectData spawnObjectData) :
-		base(iGlobalCooldown, iPawn, spawnObjectData)
-	{
-		_iEntity = iEntity;
-	}
-
-	protected override void Execute()
-	{
-		_timerCooldown = _spawnObjectData.Cooldown;
-		var obj = _iPawn.SpawnObect(_spawnObjectData.Prefab, _iPawn.GetPosition(), _iPawn.GetRotation());
-		var script = obj.GetComponent<ProjectileComponent>();
-		if (script != null)
-		{
-			script.Damage = _iEntity.GetAmountDamage();
-		}
-	}
-}
 
 public interface IEntity
 {
@@ -272,16 +181,13 @@ public interface IEntity
 	float GetAmountDamage();
 }
 
-public interface IGlobalCooldown
-{
-	void SetGlobalCooldown(float duration = 0.5f);
-}
 
-public interface IPawn
+public interface ICommandUtils
 {
 	Quaternion GetRotation();
 	Vector3 GetPosition();
 	GameObject SpawnObect(GameObject prefab, Vector3 pos, Quaternion rot);
+	void SetGlobalCooldown(float duration = 0.5f);
 }
 
 [System.Serializable]
@@ -291,7 +197,9 @@ public class SpawnObjectData
 	public float Cooldown;
 }
 
-public interface IInflictDmg
+
+
+public interface IDeath
 {
-	void InflictDmg(EntityComponent entity);
+	void OnDeath();
 }

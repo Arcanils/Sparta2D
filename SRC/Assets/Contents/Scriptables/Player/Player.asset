@@ -16,3 +16,21 @@ MonoBehaviour:
       type: 2}
     Pawn: {fileID: 114366262276515870, guid: 32e0e317730a3af458e88e3a19acffcc, type: 2}
   ControllerConfig: {fileID: 11400000, guid: e7d1ebe391620e24b9d8aead3139bc20, type: 2}
+  PawnConfig:
+    EntityData:
+      BaseStats:
+        Values:
+        - Key: 0
+          Value: 10
+        - Key: 1
+          Value: 10
+        - Key: 2
+          Value: 10
+        - Key: 3
+          Value: 10
+        - Key: 4
+          Value: 10
+      GainBaseStatsByLvl:
+        Values: []
+    CmdsScriptable:
+    - {fileID: 11400000, guid: ad0969cf5f93f0e46aa43f8973a84556, type: 2}

@@ -6,8 +6,9 @@ using UnityEngine;
 public class AttackCollider : MonoBehaviour {
 
 	public Rect RectCollision;
-	
-	private IInflictDmg _inflictDMG;
+
+	public float Damage;
+
 	private IPivotAttack _pivotAttack;
 	private Coroutine _routine;
 	private Transform _trans;
@@ -21,11 +22,10 @@ public class AttackCollider : MonoBehaviour {
 		Gizmos.DrawCube(transform.position + new Vector3(RectCollision.x + RectCollision.size.x, RectCollision.y + RectCollision.size.y), Vector3.one * 0.1f);
 	}
 
-	public void Init(IInflictDmg inflictDMG, IPivotAttack pivotAttack)
+	public void Init(IPivotAttack pivotAttack)
 	{
 		_trans = transform;
 		_pivotAttack = pivotAttack;
-		_inflictDMG = inflictDMG;
 		_orgine = _trans.position - pivotAttack.GetPosition();
 	}
 
@@ -50,7 +50,7 @@ public class AttackCollider : MonoBehaviour {
 			{
 				for (int i = 0; i < hits.Length; i++)
 				{
-					_inflictDMG.InflictDmg(hits[i]);
+					hits[i].ReceiveDamage(Damage);
 				}
 			}
 			yield return null;

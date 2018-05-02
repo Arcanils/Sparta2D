@@ -37,7 +37,6 @@ GameObject:
   - component: {fileID: 61408054650168518}
   - component: {fileID: 114763285157176484}
   - component: {fileID: 50335397784551770}
-  - component: {fileID: 114569607708870220}
   - component: {fileID: 114335894926384066}
   m_Layer: 9
   m_Name: EnemyDummy
@@ -233,38 +232,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f31d7408e1b73449688601920af39a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114569607708870220
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1390380730004582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 522eee5b0704d6d42bc636c3113badcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CurrentHP: 0
-  Stats:
-    EntityData:
-      BaseStats:
-        Values:
-        - Key: 0
-          Value: 10
-        - Key: 1
-          Value: 10
-        - Key: 2
-          Value: 10
-        - Key: 3
-          Value: 10
-        - Key: 4
-          Value: 10
-      GainBaseStatsByLvl:
-        Values: []
-    Buffs: []
-    CurrentStats:
-      Values: []
-  UIFeedback: {fileID: 114027585304170880}
 --- !u!114 &114763285157176484
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -276,13 +243,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29f13007ffa009b488b74cb6edc5ab23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnData:
-  - Prefab: {fileID: 1243630603867584, guid: e9b2cf243158d6f48842fb6373bee1cb, type: 2}
-    Cooldown: 1
   MoveData:
     SpeedMove: 2
-  AttackData:
-    RefAttackCac: {fileID: 0}
 --- !u!212 &212076261620164584
 SpriteRenderer:
   m_ObjectHideFlags: 1

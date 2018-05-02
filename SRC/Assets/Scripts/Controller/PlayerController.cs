@@ -41,4 +41,14 @@ public class PlayerController : BaseController
 		if (Input.GetButtonUp(keyBind2))
 			_refPawn.CallInputBinded(1, false);
 	}
+
+	public override void TickMove(float DeltaTime)
+	{
+		_refPawn.TickMove(DeltaTime);
+	}
+
+	public override void TickEntity(float DeltaTime)
+	{
+		_refPawn.TickCmds(DeltaTime);
+	}
 }

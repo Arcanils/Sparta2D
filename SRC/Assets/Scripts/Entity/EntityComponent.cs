@@ -3,64 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class EntityComponent : MonoBehaviour, IMapCollision, IEntity
+public class EntityComponent: IEntity
 {
-	public float CurrentHP;
-	public Entity Stats;
-	public UIEntityStatus UIFeedback;
-
-	private Collider2D _col;
+	private UIEntityStatus _uiEntityStatus;
+	private float _currentHP;
+	private Entity _entityStats;
+	
 	private float _baseHP;
 
-	public void Awake()
+	private IDeath _iDeath;
+
+	public EntityComponent(Entity entity)
 	{
-		_col = GetComponent<Collider2D>();
-		Stats.CalculFinalStats();
-		_baseHP = Stats.HP;
-		CurrentHP = _baseHP;
+		this._entityStats = entity;
 	}
 
-	public void Start()
+	public void Init(IDeath iDeath)
 	{
-		EntityMapping.Instance.AddEntity(this);
+		_iDeath = iDeath;
+		_entityStats.CalculFinalStats();
+		_baseHP = _entityStats.HP;
+		_currentHP = _baseHP;
 	}
 	
 
-	public void InflictDMG(EntityComponent target)
+	public void InflictDMG(IEntity target)
 	{
 		if (target == null && target != this)
 			return;
-		target.ReceiveDamage(Stats.PhysicsDMG);
+		target.ReceiveDamage(_entityStats.PhysicsDMG);
 		//target.ReceiveDMG(0f);
 		Debug.LogError("InflictDMG !");
 	}
-
-	public Rect GetRectCollision()
-	{
-		return new Rect(_col.bounds.min, _col.bounds.size);
-	}
-
-	public EntityComponent GetEntity()
-	{
-		return this;
-	}
+	
 
 	public void ReceiveDamage(float damage)
 	{
-		CurrentHP -= Mathf.Max(damage - Stats.PhysicsRes, 0f);
-		if (UIFeedback != null)
-			UIFeedback.UpdateHPValue(CurrentHP / _baseHP);
+		_currentHP -= Mathf.Max(damage - _entityStats.PhysicsRes, 0f);
+		if (_uiEntityStatus != null)
+			_uiEntityStatus.UpdateHPValue(_currentHP / _baseHP);
 		Debug.LogError("ReceiveDMG !");
-		if (CurrentHP < 0f)
+		if (_currentHP < 0f)
 		{
-			if (UIFeedback != null)
-				UIFeedback.OnDeath();
-			Destroy(gameObject);
+			if (_uiEntityStatus != null)
+				_uiEntityStatus.OnDeath();
+			_iDeath.OnDeath();
 		}
 	}
 
 	public float GetAmountDamage()
 	{
-		return Stats.PhysicsDMG;
+		return _entityStats.PhysicsDMG;
 	}
 }

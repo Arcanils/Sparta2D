@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,14 +12,14 @@ public class EntityMapping : MonoBehaviour {
 	public int NCollumns;
 	public int NLines;
 
-	private Dictionary<Vector2Int, List<IMapCollision>> _map;
-	private List<IMapCollision> _entitiesToTrack;
+	private Dictionary<Vector2Int, List<IPawnCollision>> _map;
+	private List<IPawnCollision> _entitiesToTrack;
 
 	private void Awake()
 	{
 		Instance = this;
-		_map = new Dictionary<Vector2Int, List<IMapCollision>>();
-		_entitiesToTrack = new List<IMapCollision>();
+		_map = new Dictionary<Vector2Int, List<IPawnCollision>>();
+		_entitiesToTrack = new List<IPawnCollision>();
 	}
 
 	private void LateUpdate()
@@ -26,14 +27,18 @@ public class EntityMapping : MonoBehaviour {
 		UpdateMap();
 	}
 
-	public void AddEntity(IMapCollision entity)
+	public void AddEntity(IPawnCollision entity)
 	{
 		_entitiesToTrack.Add(entity);
 	}
-
-	public EntityComponent[] HitInRect(RectOriented rect)
+	public void RemoveEntity(IPawnCollision iPawnCollision)
 	{
-		var hitted = new List<IMapCollision>();
+		_entitiesToTrack.Remove(iPawnCollision);
+	}
+
+	public IEntity[] HitInRect(RectOriented rect)
+	{
+		var hitted = new List<IPawnCollision>();
 
 		var pos = new Vector2Int();
 		var bl = rect.BLContainerPointOriented + SizeMap;
@@ -51,7 +56,7 @@ public class EntityMapping : MonoBehaviour {
 			{
 				pos.Set(z, j);
 
-				List<IMapCollision> entities;
+				List<IPawnCollision> entities;
 				if (!_map.TryGetValue(pos, out entities))
 					continue;
 				for (int i = entities.Count - 1; i >= 0; --i)
@@ -75,6 +80,7 @@ public class EntityMapping : MonoBehaviour {
 		return dataUniqueHit.Select(item => item.GetEntity()).ToArray();
 	}
 
+
 	private void UpdateMap()
 	{
 		_map.Clear();
@@ -96,7 +102,7 @@ public class EntityMapping : MonoBehaviour {
 				{
 					pos.Set(z, j);
 					if (!_map.ContainsKey(pos))
-						_map[pos] = new List<IMapCollision>();
+						_map[pos] = new List<IPawnCollision>();
 					_map[pos].Add(_entitiesToTrack[i]);
 				}
 			}
@@ -104,10 +110,10 @@ public class EntityMapping : MonoBehaviour {
 	}
 }
 
-public interface IMapCollision
+public interface IPawnCollision
 {
 	Rect GetRectCollision();
-	EntityComponent GetEntity();
+	IEntity GetEntity();
 }
 
 public struct RectOriented
