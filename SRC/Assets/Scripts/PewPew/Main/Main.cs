@@ -75,7 +75,10 @@ public class Main : MonoBehaviour
 
 	private void SpawnGame()
 	{
-		EntityFactoryInstance.GetNewEntity(Player, SpawnPlayer.position);
+		PawnComponent pawnPlayer;
+		AbstractController controller;
+		EntityFactoryInstance.GetNewEntity(Player, SpawnPlayer.position, out pawnPlayer, out controller);
+		GameCameraInstance.Init(pawnPlayer.transform);
 	}
 
 	private void RespawnPlayer()

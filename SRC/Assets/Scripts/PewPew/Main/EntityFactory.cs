@@ -35,11 +35,9 @@ public class EntityFactory
 		return controller;
 	}
 
-	public GameObject GetNewEntity(EntityConfig Data, Vector3 Position)
+	public void GetNewEntity(EntityConfig Data, Vector3 Position, out PawnComponent pawn, out AbstractController controller)
 	{
-		var Pawn = GetNewPawn(Data, Position);
-		var Controller = GetNewController(Data, Pawn);
-
-		return Controller.gameObject;
+		pawn = GetNewPawn(Data, Position);
+		controller = GetNewController(Data, pawn);
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class GameCamera : MonoBehaviour
 
 
 	private Transform _transCam;
+	private Transform _target;
 
 	public void Awake()
 	{
@@ -19,6 +21,11 @@ public class GameCamera : MonoBehaviour
 		OffsetY = 4;
 	}
 
+	public void Update()
+	{
+		UpdateFollowingCam();
+	}
+
 	public void UpdatePosCam()
 	{
 		//NONE
@@ -26,8 +33,12 @@ public class GameCamera : MonoBehaviour
 
 	public void UpdateFollowingCam()
 	{
-		float Center = 0f;
+		Vector2 center = new Vector2(_target.position.x, _target.position.y);
+		_transCam.position = new Vector3(center.x, center.y, _transCam.position.z);
+	}
 
-		_transCam.position = new Vector3(_transCam.position.x, Center, _transCam.position.z);
+	public void Init(Transform target)
+	{
+		_target = target;
 	}
 }

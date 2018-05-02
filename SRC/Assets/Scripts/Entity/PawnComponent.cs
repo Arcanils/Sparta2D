@@ -5,6 +5,7 @@ using UnityEngine;
 public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision
 {
 	public MoveBehaviour MoveData;
+	public Anim2DComponent Anim;
 
 	private EntityComponent _entity;
 	private BaseCommande[] _cmds;
@@ -15,9 +16,11 @@ public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollisio
 
 	public void Init(PawnStructConfig config)
 	{
+		if (Anim == null)
+			Anim = GetComponentInChildren<Anim2DComponent>();
 		_trans = transform;
 		_col = GetComponent<Collider2D>();
-		MoveData.Init(transform);
+		MoveData.Init(transform, Anim);
 
 		_entity = config.GetEntity();
 		_entity.Init(this);
@@ -103,7 +106,7 @@ public abstract class AbstractPawnBehaviour
 }
 
 [System.Serializable]
-public class MoveBehaviour : AbstractPawnBehaviour
+public class MoveBehaviour
 {
 	public float SpeedMove = 10f;
 
@@ -112,18 +115,30 @@ public class MoveBehaviour : AbstractPawnBehaviour
 	private Vector2 _position;
 
 	private Vector2 _moveDir;
+	private Anim2DComponent _anim;
 	
 
-	public override void Init(Transform trans)
+	public void Init(Transform trans, Anim2DComponent anim)
 	{
 		_trans = trans;
 		_rigid = trans.GetComponent<Rigidbody2D>();
+		_anim = anim;
 	}
 
-	public override void Tick(float deltaTime)
+	public void Tick(float deltaTime)
 	{
 		_position = new Vector2(_trans.position.x, _trans.position.y) + _moveDir * SpeedMove * Time.fixedDeltaTime;
 		_rigid.MovePosition(_position);
+
+		if (_moveDir.x > 0f)
+			_anim.PlayAnim("Right");
+		else if (_moveDir.x < 0f)
+			_anim.PlayAnim("Left");
+		else if(_moveDir.y > 0f)
+			_anim.PlayAnim("Top");
+		else if (_moveDir.y < 0f)
+			_anim.PlayAnim("Bottom");
+
 	}
 
 
