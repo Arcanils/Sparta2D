@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686d9c95df7313546a04e5ae2976bcba, type: 3}
+  m_Name: Player
+  m_EditorClassIdentifier: 
+  PrefabControllerPawn:
+    Controller: {fileID: 114785037475776550, guid: ece6e95624569f74f9f97162cc9bf8ef,
+      type: 2}
+    Pawn: {fileID: 114366262276515870, guid: 32e0e317730a3af458e88e3a19acffcc, type: 2}
+  ControllerConfig: {fileID: 11400000, guid: e7d1ebe391620e24b9d8aead3139bc20, type: 2}

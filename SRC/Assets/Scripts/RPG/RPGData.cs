@@ -154,7 +154,7 @@ public struct StatClamp
 }
 
 [Serializable]
-public class EntityConfig
+public class EntityDataConfig
 {
 	public Stats BaseStats;
 	public Stats GainBaseStatsByLvl;
@@ -168,7 +168,7 @@ public class EntityConfig
 [Serializable]
 public class Entity
 {
-	public EntityConfig EntityData;
+	public EntityDataConfig EntityData;
 	public EntityEquipement Equipements;
 	public BuffStats[] Buffs;
 	public Stats CurrentStats;

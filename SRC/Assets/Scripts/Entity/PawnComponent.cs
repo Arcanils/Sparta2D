@@ -38,6 +38,11 @@ public class PawnComponent : MonoBehaviour, IGlobalCooldown, IPawn
 		}
 	}
 
+	public void Init(PawnStructConfig config)
+	{
+
+	}
+
 	public void InputMove(Vector2 dir)
 	{
 		MoveData.SetDirection(dir);

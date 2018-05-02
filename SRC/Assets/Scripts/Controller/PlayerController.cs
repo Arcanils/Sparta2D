@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
-
-
-	private PawnComponent _pawn; 
-
+public class PlayerController : BaseController
+{
 	private static string keyHorizontal = "Horizontal";
 	private static string keyVertical = "Vertical";
 	private static string keyHorizontalAttack = "HorizontalAttack";
@@ -15,33 +12,33 @@ public class PlayerController : MonoBehaviour {
 	private static string keyBind1 = "Fire1";
 	private static string keyBind2 = "Fire2";
 
-	private void Awake()
+	public override void Init(ControllerComponentConfig Config)
 	{
-		_pawn = FindObjectsOfType<PawnComponent>().First(item => item.tag == "Player");
+		base.Init(Config);
 	}
 
-	private void Update()
+	public override void TickAI(float DeltaTime)
 	{
 		var moveDir = new Vector2(Input.GetAxisRaw(keyHorizontal), Input.GetAxisRaw(keyVertical));
 		if (moveDir != Vector2.zero)
 			moveDir.Normalize();
 
-		_pawn.InputMove(moveDir);
+		_refPawn.InputMove(moveDir);
 
 		var attackDir = new Vector2(Input.GetAxisRaw(keyHorizontalAttack), Input.GetAxisRaw(keyVeticalAttack));
 		if (attackDir != Vector2.zero)
 			attackDir.Normalize();
 
-		_pawn.InputDirAttack(attackDir);
+		_refPawn.InputDirAttack(attackDir);
 
 		if (Input.GetButtonDown(keyBind1))
-			_pawn.CallInputBinded(0, true);
+			_refPawn.CallInputBinded(0, true);
 		if (Input.GetButtonUp(keyBind1))
-			_pawn.CallInputBinded(0, false);
+			_refPawn.CallInputBinded(0, false);
 
 		if (Input.GetButtonDown(keyBind2))
-			_pawn.CallInputBinded(1, true);
+			_refPawn.CallInputBinded(1, true);
 		if (Input.GetButtonUp(keyBind2))
-			_pawn.CallInputBinded(1, false);
+			_refPawn.CallInputBinded(1, false);
 	}
 }
