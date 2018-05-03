@@ -40,6 +40,11 @@ public class PlayerController : BaseController
 			_refPawn.CallInputBinded(1, true);
 		if (Input.GetButtonUp(keyBind2))
 			_refPawn.CallInputBinded(1, false);
+
+		if (Input.GetKeyDown(KeyCode.P))
+		{
+			_refPawn.ShowUIStats();
+		}
 	}
 
 	public override void TickMove(float DeltaTime)

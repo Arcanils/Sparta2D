@@ -55,4 +55,9 @@ public class EntityComponent: IEntity
 	{
 		return _entityStats.PhysicsDMG;
 	}
+
+	public void ShowUIStats()
+	{
+		Object.FindObjectOfType<UIDisplayEntityStats>().GenerateUI(_entityStats.CurrentStats, _entityStats.Equipements);
+	}
 }

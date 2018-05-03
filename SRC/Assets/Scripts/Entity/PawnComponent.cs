@@ -59,6 +59,11 @@ public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollisio
 		_cmds[indexInput].InputExecute(input);
 	}
 
+	public void ShowUIStats()
+	{
+		_entity.ShowUIStats();
+	}
+
 	Quaternion ICommandUtils.GetRotation()
 	{
 		return _rotationAttack;
