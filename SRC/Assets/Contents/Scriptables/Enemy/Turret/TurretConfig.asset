@@ -9,28 +9,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 686d9c95df7313546a04e5ae2976bcba, type: 3}
-  m_Name: Player
+  m_Name: TurretConfig
   m_EditorClassIdentifier: 
   PrefabControllerPawn:
     Controller: {fileID: 114785037475776550, guid: ece6e95624569f74f9f97162cc9bf8ef,
       type: 2}
-    Pawn: {fileID: 114366262276515870, guid: 32e0e317730a3af458e88e3a19acffcc, type: 2}
-  ControllerConfig: {fileID: 11400000, guid: 2ef8be4e34c5c4345a9aee650b1076f4, type: 2}
+    Pawn: {fileID: 114335894926384066, guid: 515af7eb8f4c26a468e363738ee7344d, type: 2}
+  ControllerConfig: {fileID: 11400000, guid: e45402c536efba740a29b890c0a5ca12, type: 2}
   PawnConfig:
     EntityData:
       BaseStats:
-        Values:
-        - Key: 0
-          Value: 10
-        - Key: 1
-          Value: 10
-        - Key: 2
-          Value: 10
-        - Key: 3
-          Value: 10
-        - Key: 4
-          Value: 10
+        Values: []
       GainBaseStatsByLvl:
         Values: []
     CmdsScriptable:
-    - {fileID: 11400000, guid: ad0969cf5f93f0e46aa43f8973a84556, type: 2}
+    - {fileID: 11400000, guid: b97a8f3b5ac2d7c408e2359200496d10, type: 2}

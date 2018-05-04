@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision
+public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision, IControllPawn
 {
 	public MoveBehaviour MoveData;
 	public Anim2DComponent Anim;
@@ -42,27 +42,28 @@ public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollisio
 		}
 	}
 
-	public void InputMove(Vector2 dir)
+	public void ShowUIStats()
+	{
+		_entity.ShowUIStats();
+	}
+
+	void IControllPawn.InputMove(Vector2 dir)
 	{
 		MoveData.SetDirection(dir);
 	}
 
-	public void InputDirAttack(Vector2 dir)
+	void IControllPawn.InputDirAttack(Vector2 dir)
 	{
 		float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
 		_rotationAttack = Quaternion.Euler(0f, 0f, angle);
 	}
 
-	public void CallInputBinded(int indexInput, bool input)
+	void IControllPawn.InputActionBind(int indexInput, bool input)
 	{
 		_cmds[indexInput].InputExecute(input);
 	}
 
-	public void ShowUIStats()
-	{
-		_entity.ShowUIStats();
-	}
 
 	Quaternion ICommandUtils.GetRotation()
 	{
@@ -101,6 +102,11 @@ public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollisio
 	public IEntity GetEntity()
 	{
 		return _entity;
+	}
+
+	public Vector2 GetPosition()
+	{
+		return _trans.position;
 	}
 }
 
