@@ -1,15 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Main : MonoBehaviour
+public class Main : MonoBehaviour , IRoundBehaviour, IUIBehaviourUtils
 {
 	public static Main Instance { get; private set; }
 
+	public UIBehaviour UiBehaviour;
 	public EntityConfig Player;
 	public Transform SpawnPlayer;
-
-	public LvlConfig[] LvlConfigs;
 
 	[SerializeField]
 	private GameCamera PrefabCam;
@@ -19,8 +19,10 @@ public class Main : MonoBehaviour
 	public GameplayLoop GameplayLoopInstance { get; private set; }
 	public EntityFactory EntityFactoryInstance { get; private set; }
 
-	private LoaderLvl _loadLvl;
+	[SerializeField]
+	private LvlLoader _loadLvl;
 
+	private RoundBehaviour _roundBehaviour;
 	public void Awake()
 	{
 		InitPoolManager();
@@ -28,12 +30,14 @@ public class Main : MonoBehaviour
 		InitGameplayLoop();
 		InitEntityFactory();
 		InitLoaderLvl();
+		_roundBehaviour = new RoundBehaviour(UiBehaviour, this, this);
 		Instance = this;
+		UiBehaviour.Init(this);
 	}
 
 	public void Start()
 	{
-		StartCoroutine(MainGameplayEnum());
+		StartGameplay();
 	}
 
 	private void InitPoolManager()
@@ -59,16 +63,14 @@ public class Main : MonoBehaviour
 
 	private void InitLoaderLvl()
 	{
-		_loadLvl = new LoaderLvl(EntityFactoryInstance);
+		_loadLvl.Init(EntityFactoryInstance);
 	}
 
-	private IEnumerator MainGameplayEnum()
+	private void StartGameplay()
 	{
 		StartCoroutine(MainGameplayFixedEnum());
 		StartCoroutine(MainGameplayNormalEnum());
-		yield return new WaitForSeconds(0.1f);
-		SpawnGame();
-		//_loadLvl.StartRound();
+		_roundBehaviour.StartNewRound();
 	}
 
 	private IEnumerator MainGameplayFixedEnum()
@@ -88,82 +90,146 @@ public class Main : MonoBehaviour
 		}
 	}
 
-	private void SpawnGame()
+	private void ClearPlayer()
 	{
+
+	}
+
+	AbstractController IRoundBehaviour.SpawnPlayer()
+	{
+		ClearPlayer();
+
 		PawnComponent pawnPlayer;
 		AbstractController controller;
 		EntityFactoryInstance.GetNewEntity(Player, SpawnPlayer.position, out pawnPlayer, out controller);
 		GameCameraInstance.Init(pawnPlayer.transform);
+
+		return controller;
 	}
 
-	private void RespawnPlayer()
+	List<AbstractController> IRoundBehaviour.SpawnLvl(int indexLevel)
 	{
-		//EntityFactoryInstance.GetNewEntity(LvlConfigs[0].Player, new Vector3(-6f, 0f, 0f));
+		return _loadLvl.LoadLvl(indexLevel);
 	}
-	
+
+	void IRoundBehaviour.ClearRound(bool all)
+	{
+	}
+
+	void IUIBehaviourUtils.PauseGame(bool Pause)
+	{
+		//PauseLoopGameplay
+		//SpawnController Player MENU
+	}
+
+	int IUIBehaviourUtils.GetCurrentIndexRound()
+	{
+		return _roundBehaviour.IndexRound;
+	}
 }
 
 public class RoundBehaviour
 {
-	public Transform[] SpawnPosition;
+	public int IndexRound { get; private set; }
 
 	private IUiRoundBehaviour _iUIBehaviour;
+	private MonoBehaviour _runner;
+	private IRoundBehaviour _iRoundBehaviour;
+	private List<AbstractController> _entitiesAlives;
+	private AbstractController _player;
 
-	public void Init(IUiRoundBehaviour iUIBehaviour)
+	public RoundBehaviour(IUiRoundBehaviour iUIBehaviour, IRoundBehaviour iRoundBehaviour, MonoBehaviour runner)
 	{
 		_iUIBehaviour = iUIBehaviour;
+		_iRoundBehaviour = iRoundBehaviour;
+		_runner = runner;
 	}
 
 	public void StartNewRound()
 	{
-
+		_runner.StartCoroutine(StartNewRoundEnum());
 	}
 
-	public void ClearRound()
+	private void OnPlayerDeath(AbstractController controller)
 	{
+		_player.Destroy();
 
+		_player = null;
 	}
 
-	public void OnRoundComplete()
+	private void OnEnemyDeath(AbstractController controller)
 	{
+		var entity = _entitiesAlives.First(item => item == controller);
 
+		entity.Destroy();
+
+		_entitiesAlives.Remove(entity);
 	}
 
-	public void OnRoundFailed()
+	private void ClearRound(bool success)
 	{
-
+		if (!success)
+		_iRoundBehaviour.ClearRound(!success);
 	}
 
-	public IEnumerator StartNewRoundEnum()
+	private void OnRoundComplete()
 	{
-		ClearRound();
-		//Print NextRound
+		_runner.StartCoroutine(OnRoundCompleteEnum());
+	}
+
+	private void OnRoundFailed()
+	{
+		_runner.StartCoroutine(OnRoundFailedEnum());
+	}
+
+	private IEnumerator StartNewRoundEnum()
+	{
+		ClearRound(false);
+		_player = _iRoundBehaviour.SpawnPlayer();
+		IndexRound = 0;
+
+		yield return _iUIBehaviour.ShowRestart();
+		yield return _iUIBehaviour.ShowCurrentLvlAnimEnum();
+		_entitiesAlives = _iRoundBehaviour.SpawnLvl(IndexRound);
+
 		yield return null;
 	}
 
-	public IEnumerator OnRoundCompleteEnum()
+	private IEnumerator OnRoundCompleteEnum()
 	{
-		//PrintCurrent lvl success
-		//Print NextRound
-		//Spawn
+		ClearRound(true);
+
+		yield return _iUIBehaviour.ShowSuccessAnim();
+		++IndexRound;
+		yield return _iUIBehaviour.ShowCurrentLvlAnimEnum();
+		_entitiesAlives =_iRoundBehaviour.SpawnLvl(IndexRound);
+
 		yield return null;
 	}
 
-	public IEnumerator OnRoundFailedEnum()
+	private IEnumerator OnRoundFailedEnum()
 	{
-		//PrintCurrent lvl failure
-		//Show loot / Equipement Phase
-		//Skill Tree, Skill switch
-		//Wait input to restart
-		yield return null;
+		yield return _iUIBehaviour.ShowFailureAnim();
+		yield return _iUIBehaviour.ShowLootPhaseEnum();
+		yield return _iUIBehaviour.ShowSkillPhaseEnum();
+		_runner.StartCoroutine(StartNewRoundEnum());
 	}
+
 }
 
 public interface IUiRoundBehaviour
 {
-	IEnumerator ShowCurrentLvlAnimEnum(bool success);
-	IEnumerator ShowNextLvlAnimEnum();
+	IEnumerator ShowCurrentLvlAnimEnum();
+	IEnumerator ShowSuccessAnim();
+	IEnumerator ShowFailureAnim();
 	IEnumerator ShowLootPhaseEnum();
 	IEnumerator ShowSkillPhaseEnum();
 	IEnumerator ShowRestart();
+}
+
+public interface IRoundBehaviour
+{
+	AbstractController SpawnPlayer();
+	List<AbstractController> SpawnLvl(int indexLvl);
+	void ClearRound(bool all);
 }

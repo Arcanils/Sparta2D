@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision, IControllPawn
+public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollision, IControllPawn, IEntity
 {
 	public MoveBehaviour MoveData;
 	public Anim2DComponent Anim;
@@ -107,6 +107,16 @@ public class PawnComponent : MonoBehaviour, ICommandUtils, IDeath, IPawnCollisio
 	public Vector2 GetPosition()
 	{
 		return _trans.position;
+	}
+
+	void IEntity.ReceiveDamage(float damage)
+	{
+		_entity.ReceiveDamage(damage);
+	}
+
+	float IEntity.GetAmountDamage()
+	{
+		return _entity.GetAmountDamage();
 	}
 }
 
