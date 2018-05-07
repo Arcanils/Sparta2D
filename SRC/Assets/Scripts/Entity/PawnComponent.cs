@@ -137,19 +137,25 @@ public class MoveBehaviour
 
 	private Vector2 _moveDir;
 	private Anim2DComponent _anim;
-	
+	private ContactFilter2D _contactFilter;
 
 	public void Init(Transform trans, Anim2DComponent anim)
 	{
 		_trans = trans;
 		_rigid = trans.GetComponent<Rigidbody2D>();
 		_anim = anim;
+		_contactFilter.useTriggers = false;
+		_contactFilter.SetLayerMask(LayerMask.GetMask("Default"));
+		_contactFilter.useLayerMask = true;
 	}
 
 	public void Tick(float deltaTime)
 	{
+		/*
 		_position = new Vector2(_trans.position.x, _trans.position.y) + _moveDir * SpeedMove * Time.fixedDeltaTime;
-		_rigid.MovePosition(_position);
+		_rigid.position = _position;
+		*/
+		DoMovement();
 
 		if (_moveDir.x > 0f)
 			_anim.PlayAnim("Right");
@@ -162,10 +168,30 @@ public class MoveBehaviour
 
 	}
 
-
 	public void SetDirection(Vector2 dir)
 	{
 		_moveDir = dir;
+	}
+
+	private RaycastHit2D[] _hitBuffer = new RaycastHit2D[16];
+	private const float _skinWidth = 0.2f;
+
+	private void DoMovement()
+	{
+		var move = _moveDir * SpeedMove * Time.fixedDeltaTime;
+		var distance = move.magnitude;
+
+		int count = _rigid.Cast(_moveDir, _contactFilter, _hitBuffer, distance + _skinWidth);
+
+		for (int i = 0; i < count; i++)
+		{
+			Vector2 currentNormal = _hitBuffer[i].normal;
+
+			float modifiedDistance = _hitBuffer[i].distance - _skinWidth;
+			distance = modifiedDistance < distance ? modifiedDistance : distance;
+		}
+
+		_rigid.position = _rigid.position + _moveDir * distance;
 	}
 }
 
