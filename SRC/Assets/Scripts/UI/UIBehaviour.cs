@@ -8,7 +8,10 @@ public class UIBehaviour : MonoBehaviour, IUiRoundBehaviour
 	public AnimationCurve CurveAnim;
 	public UIDisplayEntityStats UIEntityStats;
 	public float DurationAnimText = 2f;
-	//Loot
+
+	public GameObject PrefabLoot;
+	public RectTransform ContentLoot;
+	public RectTransform ContainerLoot;
 	//SkillTree
 	//SkillExchange
 
@@ -58,6 +61,13 @@ public class UIBehaviour : MonoBehaviour, IUiRoundBehaviour
 
 	IEnumerator IUiRoundBehaviour.ShowLootPhaseEnum()
 	{
+		var count = 0;
+
+		for (int i = 0; i < count; i++)
+		{
+			var instance = GameObject.Instantiate(PrefabLoot, ContentLoot, false);
+		}
+		ContainerLoot.gameObject.SetActive(true);
 		yield return new WaitForSeconds(1f);
 	}
 
